@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "client": "Ananya",
+    "review": "I came in with a rough idea and a cropped reference photo. Arjun drew something better than anything I could have imagined, and the shading work is already settling in beautifully.",
+    "style": "Realism · Shoulder",
+    "tattooId": "tattoo-03",
+    "rating": 5
+  },
+  {
+    "id": 2,
+    "client": "Rohan",
+    "review": "Six years of hating a tattoo, one session with Rhea, and it's gone — not covered, actually gone. People ask about the new piece constantly. I can't recommend them enough.",
+    "style": "Cover-Up · Shoulder Blade",
+    "tattooId": "tattoo-07",
+    "rating": 5
+  },
+  {
+    "id": 3,
+    "client": "Kiara",
+    "review": "Meera's fine line work is unreal. She sat with placement for almost an hour before a single line — and it shows. It moves exactly the way she promised it would.",
+    "style": "Fine Line · Wrist",
+    "tattooId": "tattoo-06",
+    "rating": 5
+  },
+  {
+    "id": 4,
+    "client": "Dev",
+    "review": "The koi on my thigh took three sessions and every one of them felt like a collaboration, not just an appointment. Sidharth treats your body like a canvas with an opinion.",
+    "style": "Color · Full Thigh",
+    "tattooId": "tattoo-05",
+    "rating": 5
+  },
+  {
+    "id": 5,
+    "client": "Farah",
+    "review": "Spotless studio, honest advice, zero pressure. They told me to wait on a piece I was excited about and redesign it — three months later I'm glad they did.",
+    "style": "Minimal · Collarbone",
+    "tattooId": "tattoo-10",
+    "rating": 5
+  },
+  {
+    "id": 6,
+    "client": "Armaan",
+    "review": "Walked in with a completely open brief, walked out with a sleeve plan. Every step was explained, every price was upfront, and the aftercare follow-up actually happened.",
+    "style": "Blackwork · Upper Arm",
+    "tattooId": "tattoo-02",
+    "rating": 5
+  }
+]

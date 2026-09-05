@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink-950 text-ink-100 font-body antialiased;
+  }
+
+  ::selection {
+    background: #f2efe9;
+    color: #0a0a0b;
+  }
+
+  :focus-visible {
+    outline: 2px solid #f2efe9;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  img {
+    @apply select-none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0b;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2e2e33;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #45454c;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Archivo', system-ui, sans-serif;
+  }
+
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(242, 239, 233, 0.35);
+    color: transparent;
+  }
+
+  .text-outline-strong {
+    -webkit-text-stroke: 1px rgba(242, 239, 233, 0.85);
+    color: transparent;
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Hide scrollbar utility for filter rails */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Cinematic film grain overlay */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}

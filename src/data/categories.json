@@ -1,0 +1,10 @@
+[
+  { "id": "realism", "label": "REALISM" },
+  { "id": "fine-line", "label": "FINE LINE" },
+  { "id": "blackwork", "label": "BLACKWORK" },
+  { "id": "traditional", "label": "TRADITIONAL" },
+  { "id": "color", "label": "COLOR" },
+  { "id": "minimal", "label": "MINIMAL" },
+  { "id": "cover-up", "label": "COVER-UP" },
+  { "id": "custom", "label": "CUSTOM" }
+]

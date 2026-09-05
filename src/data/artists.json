@@ -1,0 +1,69 @@
+[
+  {
+    "id": "arjun",
+    "name": "Arjun",
+    "role": "Founder & Lead Artist",
+    "specialties": [
+      "Realism",
+      "Blackwork"
+    ],
+    "portrait": "/artists/arjun.svg",
+    "experienceYears": 12,
+    "shortBio": "Precision realism and bold blackwork, built on a decade of discipline and drawing.",
+    "bio": "Arjun founded Oddaka Inksters with a simple belief — a tattoo should belong to the person who carries it. Trained in traditional drawing before he ever picked up a machine, his work moves between hyper-detailed realism and heavy, confident blackwork. Every piece starts on paper, drawn and redrawn until the design earns the skin it will live on.",
+    "instagram": "https://www.instagram.com/oddakainksters__/",
+    "featured": true,
+    "order": 1
+  },
+  {
+    "id": "meera",
+    "name": "Meera",
+    "role": "Fine Line Artist",
+    "specialties": [
+      "Fine Line",
+      "Minimal",
+      "Ornamental"
+    ],
+    "portrait": "/artists/meera.svg",
+    "experienceYears": 8,
+    "shortBio": "Delicate fine-line and ornamental compositions for people who want subtlety and intention.",
+    "bio": "Meera treats a tattoo like calligraphy — every stroke has weight, direction and a reason. Her fine-line style favours restraint: single-needle florals, ornamental line work and quiet, confident minimal pieces. She spends as long on placement as she does on the design, because where a tattoo sits matters as much as what it is.",
+    "instagram": "https://www.instagram.com/oddakainksters__/",
+    "featured": true,
+    "order": 2
+  },
+  {
+    "id": "sid",
+    "name": "Sidharth",
+    "role": "Senior Tattoo Artist",
+    "specialties": [
+      "Traditional",
+      "Color",
+      "Neo-Traditional"
+    ],
+    "portrait": "/artists/sid.svg",
+    "experienceYears": 10,
+    "shortBio": "Loud color and time-tested traditional craft with a modern edge.",
+    "bio": "Sidharth believes color should do the talking. Rooted in American traditional tattooing, his work layers bold outlines with saturated, confident color — then bends those rules for neo-traditional pieces with more room for depth and detail. He designs for longevity; a Sidharth tattoo is made to hold for decades.",
+    "instagram": "https://www.instagram.com/oddakainksters__/",
+    "featured": true,
+    "order": 3
+  },
+  {
+    "id": "rhea",
+    "name": "Rhea",
+    "role": "Tattoo Artist",
+    "specialties": [
+      "Cover-Ups",
+      "Custom",
+      "Color Realism"
+    ],
+    "portrait": "/artists/rhea.svg",
+    "experienceYears": 7,
+    "shortBio": "Turning unwanted ink into something you actually want to keep.",
+    "bio": "Rhea specialises in the hardest brief in tattooing — cover-ups. She reads old tattoos like riddles: what the shapes, textures and patterns can be folded into, and what dark, well-placed new work can permanently retire. Her custom pieces are built around the person, never the other way around.",
+    "instagram": "https://www.instagram.com/oddakainksters__/",
+    "featured": true,
+    "order": 4
+  }
+]
