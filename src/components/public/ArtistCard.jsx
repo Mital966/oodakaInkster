@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom'
 
 function ArtistCard({ artist, worksCount = 0 }) {
   return (
-    <motion.article className="group relative overflow-hidden bg-ink-800/40" whileHover="hover">
+    <motion.article className="group relative aspect-[3/4] overflow-hidden bg-ink-800/40" whileHover="hover">
       <Link to={`/artists/${artist.id}`} className="absolute inset-0" aria-label={`${artist.name} — ${artist.role}`}>
         <motion.img
           src={artist.portrait}
           alt={`${artist.name}, ${artist.role} at Oddaka Inksters`}
           loading="lazy"
-          className="aspect-[3/4] w-full object-cover transition-transform duration-700 ease-out"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out"
           variants={{ rest: { scale: 1 }, hover: { scale: 1.04 } }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/20 to-transparent" />
