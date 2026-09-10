@@ -4,12 +4,12 @@ import { useSearchParams } from 'react-router-dom'
 import Button from '../../components/common/Button'
 import Reveal from '../../components/common/Reveal'
 import Spinner from '../../components/common/Spinner'
-import ArtistFilter from '../../components/public/ArtistFilter'
 import CategoryFilter from '../../components/public/CategoryFilter'
 import GalleryGrid from '../../components/public/GalleryGrid'
 import Page from '../../components/public/Page'
 import { getArtists, getCategories, getTattoos } from '../../data/dataService'
 import { useDataQuery } from '../../hooks/useDataQuery'
+import { cn } from '../../utils/cn'
 
 function Gallery() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -74,24 +74,37 @@ function Gallery() {
           </p>
         </Reveal>
 
-        <div className="mt-12 flex flex-col gap-3">
-          <label className="font-mono text-[9px] uppercase tracking-wide3 text-ink-500">
-            Style
-          </label>
+        <div className="mt-12 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <CategoryFilter
             categories={pills}
             active={category}
             onChange={(id) => pin({ category: id === 'all' ? '' : id })}
             counts={category === 'all' ? counts : undefined}
           />
-          <label className="mt-3 font-mono text-[9px] uppercase tracking-wide3 text-ink-500">
-            Artist
-          </label>
-          <ArtistFilter
-            artists={artists.map((a) => ({ id: a.id, label: a.name }))}
-            active={artist}
-            onChange={(id) => pin({ artist: id === 'all' ? '' : id })}
-          />
+          <div className="relative w-full shrink-0 lg:w-56">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[9px] uppercase tracking-wide3 text-ink-500">
+              Artist
+            </span>
+            <select
+              value={artist}
+              onChange={(e) => pin({ artist: e.target.value === 'all' ? '' : e.target.value })}
+              aria-label="Filter by artist"
+              className={cn(
+                'w-full cursor-pointer appearance-none rounded-full border bg-transparent py-2.5 pl-16 pr-10 font-mono text-[10px] uppercase tracking-wide2 text-ink-100 transition-colors',
+                artist === 'all' ? 'border-ink-600 text-ink-300' : 'border-bone text-bone',
+              )}
+            >
+              <option value="all" className="bg-ink-900">ALL ARTISTS</option>
+              {artists.map((a) => (
+                <option key={a.id} value={a.id} className="bg-ink-900">
+                  {a.name.toUpperCase()}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-ink-400">
+              ▾
+            </span>
+          </div>
         </div>
 
         <div className="mt-12 lg:mt-14">
