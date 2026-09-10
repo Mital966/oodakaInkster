@@ -6,6 +6,8 @@ const STYLES = {
   CONSULTATION: 'bg-violet-50 text-violet-700 ring-violet-200',
   BOOKED: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   COMPLETED: 'bg-neutral-100 text-neutral-600 ring-neutral-200',
+  CANCELLED: 'bg-red-50 text-red-700 ring-red-200',
+  ARCHIVED: 'bg-neutral-100 text-neutral-500 ring-neutral-200',
 }
 
 function StatusBadge({ status }) {

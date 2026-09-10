@@ -1,117 +1,246 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import tattoosData from '../data/tattoos.json'
-import artistsData from '../data/artists.json'
-import enquiriesData from '../data/enquiries.json'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
-  loadLocalEnquiries,
-  saveLocalEnquiries,
-  updateLocalEnquiry,
-} from '../data/enquiryStore'
+  getTattoos,
+  getArtists,
+  getCategories,
+  getReviews,
+  getEnquiries,
+  getAllOffers,
+  getSettings,
+  createTattoo,
+  updateTattoo as updateTattooSvc,
+  deleteTattoo as deleteTattooSvc,
+  toggleTattooPublish,
+  toggleTattooFeatured,
+  saveTattooMedia as saveTattooMediaSvc,
+  createArtist,
+  updateArtist as updateArtistSvc,
+  deleteArtist as deleteArtistSvc,
+  createCategory,
+  updateCategory as updateCategorySvc,
+  deleteCategory as deleteCategorySvc,
+  reorderCategory,
+  createReview,
+  updateReview as updateReviewSvc,
+  deleteReview as deleteReviewSvc,
+  createOffer,
+  updateOffer as updateOfferSvc,
+  deleteOffer as deleteOfferSvc,
+  updateEnquiry,
+  deleteEnquiry as deleteEnquirySvc,
+  saveSettings,
+  backendMode,
+  backendLabel,
+} from '../services'
 
-// Mutable data context for the admin prototype.
-//
-// Initialised from the local JSON datasets, then kept in React state and
-// mirrored to localStorage (key namespaced so public reads and admin edits
-// never collide). In Part 2 this provider is replaced by a Supabase client;
-// the exposed actions — add/update/delete/toggle + updateEnquiryStatus — are
-// the same surface the admin UI depends on.
+// Single source of truth for the admin UI. Every load goes through the
+// service layer (Supabase, or the local demo backend), and every mutation
+// calls its service then refreshes the affected collection so the UI always
+// reflects what is actually persisted.
 
-const LS_TATTOOS = 'oddaka-admin-tattoos-v1'
-const LS_ARTISTS = 'oddaka-admin-artists-v1'
+const [_, AdminDataProvider, useAdminData] = (() => {
+  const Ctx = createContext(null)
+  const Provider = ({ children }) => {
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [state, setState] = useState({
+      tattoos: [],
+      artists: [],
+      categories: [],
+      reviews: [],
+      enquiries: [],
+      offers: [],
+      settings: null,
+    })
 
-function readLocal(key) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
+    const refresh = useCallback(async () => {
+      setLoading(true)
+      try {
+        const [tattoos, artists, categories, reviews, enquiries, offers, settings] = await Promise.all([
+          getTattoos({ onlyPublished: false }),
+          getArtists({ includeInactive: true }),
+          getCategories({ includeInactive: true }),
+          getReviews({ includeUnpublished: true }),
+          getEnquiries(),
+          getAllOffers?.(),
+          getSettings(),
+        ])
+        setState({ tattoos, artists, categories, reviews, enquiries, offers: offers || [], settings })
+        setError(null)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setLoading(false)
+      }
+    }, [])
 
-function writeLocal(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    // storage unavailable — state still works for the session
-  }
-}
+    useEffect(() => {
+      refresh()
+    }, [refresh])
 
-function mergeEnquiries() {
-  const local = loadLocalEnquiries()
-  if (!local || local.length === 0) return enquiriesData
-  const ids = new Set(local.map((e) => e.id))
-  const seed = enquiriesData.filter((e) => !ids.has(e.id))
-  return [...local, ...seed]
-}
+    const artistName = useCallback(
+      (id) => state.artists.find((a) => a.id === id)?.name || 'Unassigned',
+      [state.artists],
+    )
+    const categoryLabel = useCallback(
+      (id) => state.categories.find((c) => c.id === id)?.label || 'Style',
+      [state.categories],
+    )
 
-const AdminDataContext = createContext(null)
+    // --- tattoos ---------------------------------------------------------
+    const addTattoo = async (payload) => {
+      const created = await createTattoo(payload)
+      await refresh()
+      return created
+    }
+    const updateTattoo = async (id, patch) => {
+      const updated = await updateTattooSvc(id, patch)
+      await refresh()
+      return updated
+    }
+    const deleteTattoo = async (id) => {
+      await deleteTattooSvc(id)
+      await refresh()
+    }
+    const togglePublish = async (id) => {
+      const updated = await toggleTattooPublish(id)
+      await refresh()
+      return updated
+    }
+    const toggleFeatured = async (id) => {
+      const updated = await toggleTattooFeatured(id)
+      await refresh()
+      return updated
+    }
+    const saveTattooMedia = async (id, plan) => {
+      const updated = await saveTattooMediaSvc(id, plan)
+      await refresh()
+      return updated
+    }
 
-export function AdminDataProvider({ children }) {
-  const [tattoos, setTattoos] = useState(() => readLocal(LS_TATTOOS) || tattoosData)
-  const [artists, setArtists] = useState(() => readLocal(LS_ARTISTS) || artistsData)
-  const [enquiries, setEnquiries] = useState(() => mergeEnquiries())
+    // --- artists ---------------------------------------------------------
+    const addArtist = async (payload) => {
+      const created = await createArtist(payload)
+      await refresh()
+      return created
+    }
+    const updateArtist = async (id, patch) => {
+      const updated = await updateArtistSvc(id, patch)
+      await refresh()
+      return updated
+    }
+    const deleteArtist = async (id) => {
+      await deleteArtistSvc(id)
+      await refresh()
+    }
 
-  // mirror to storage whenever state changes
-  useEffect(() => writeLocal(LS_TATTOOS, tattoos), [tattoos])
-  useEffect(() => writeLocal(LS_ARTISTS, artists), [artists])
+    // --- categories ------------------------------------------------------
+    const addCategory = async (payload) => {
+      const created = await createCategory(payload)
+      await refresh()
+      return created
+    }
+    const updateCategory = async (id, patch) => {
+      const updated = await updateCategorySvc(id, patch)
+      await refresh()
+      return updated
+    }
+    const deleteCategory = async (id) => {
+      await deleteCategorySvc(id)
+      await refresh()
+    }
+    const moveCategory = async (id, direction) => {
+      const categories = await reorderCategory(id, direction)
+      await refresh()
+      return categories
+    }
 
-  // --- tattoos -----------------------------------------------------------
-  const addTattoo = (payload) => {
-    const id = payload.id || `tattoo-${Date.now()}`
-    setTattoos((prev) => [{ ...payload, id }, ...prev])
-    return id
-  }
-  const updateTattoo = (id, patch) =>
-    setTattoos((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)))
-  const deleteTattoo = (id) => setTattoos((prev) => prev.filter((t) => t.id !== id))
-  const togglePublish = (id) =>
-    setTattoos((prev) => prev.map((t) => (t.id === id ? { ...t, published: !t.published } : t)))
-  const toggleFeatured = (id) =>
-    setTattoos((prev) => prev.map((t) => (t.id === id ? { ...t, featured: !t.featured } : t)))
+    // --- reviews ---------------------------------------------------------
+    const addReview = async (payload) => {
+      const created = await createReview(payload)
+      await refresh()
+      return created
+    }
+    const updateReview = async (id, patch) => {
+      const updated = await updateReviewSvc(id, patch)
+      await refresh()
+      return updated
+    }
+    const deleteReview = async (id) => {
+      await deleteReviewSvc(id)
+      await refresh()
+    }
 
-  // --- artists -----------------------------------------------------------
-  const addArtist = (payload) => {
-    const id = payload.id || `artist-${Date.now()}`
-    setArtists((prev) => [...prev, { ...payload, id }])
-    return id
-  }
-  const updateArtist = (id, patch) =>
-    setArtists((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)))
-  const deleteArtist = (id) => setArtists((prev) => prev.filter((a) => a.id !== id))
+    // --- offers ----------------------------------------------------------
+    const addOffer = async (payload) => {
+      const created = await createOffer(payload)
+      await refresh()
+      return created
+    }
+    const updateOffer = async (id, patch) => {
+      const updated = await updateOfferSvc(id, patch)
+      await refresh()
+      return updated
+    }
+    const deleteOffer = async (id) => {
+      await deleteOfferSvc(id)
+      await refresh()
+    }
 
-  // --- enquiries ---------------------------------------------------------
-  const updateEnquiryStatus = (id, status) => {
-    updateLocalEnquiry(id, { status })
-    setEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)))
-  }
-  const deleteEnquiry = (id) =>
-    setEnquiries((prev) => prev.filter((e) => e.id !== id))
+    // --- enquiries -------------------------------------------------------
+    const updateEnquiryStatus = async (id, status) => {
+      await updateEnquiry(id, { status })
+      await refresh()
+    }
+    const deleteEnquiry = async (id) => {
+      await deleteEnquirySvc(id)
+      await refresh()
+    }
 
-  const artistName = (id) => artists.find((a) => a.id === id)?.name || '—'
+    // --- settings --------------------------------------------------------
+    const updateSettings = async (patch) => {
+      const next = await saveSettings(patch)
+      setState((prev) => ({ ...prev, settings: next }))
+      return next
+    }
 
-  const value = useMemo(
-    () => ({
-      tattoos,
-      artists,
-      enquiries,
+    const value = {
+      ...state,
+      loading,
+      error,
+      refresh,
+      backendMode: backendMode(),
+      backendLabel: backendLabel(),
       artistName,
+      categoryLabel,
       addTattoo,
       updateTattoo,
       deleteTattoo,
       togglePublish,
       toggleFeatured,
+      saveTattooMedia,
       addArtist,
       updateArtist,
       deleteArtist,
+      addCategory,
+      updateCategory,
+      deleteCategory,
+      moveCategory,
+      addReview,
+      updateReview,
+      deleteReview,
+      addOffer,
+      updateOffer,
+      deleteOffer,
       updateEnquiryStatus,
       deleteEnquiry,
-    }),
-    [tattoos, artists, enquiries],
-  )
+      updateSettings,
+    }
 
-  return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>
-}
+    return <Ctx.Provider value={value}>{children}</Ctx.Provider>
+  }
+  const useData = () => useContext(Ctx)
+  return [Ctx, Provider, useData]
+})()
 
-export function useAdminData() {
-  return useContext(AdminDataContext)
-}
+export { AdminDataProvider, useAdminData }

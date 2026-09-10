@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oddaka Inksters — Website &amp; Admin User Manual</title>
+<style>
+  :root {
+    --ink: #17120e;
+    --ink-2: #3d342c;
+    --accent: #b3541e;
+    --accent-2: #e07a3f;
+    --bone: #f2efe9;
+    --paper: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 10.5pt;
+  }
+
+  /* ---------- pages ---------- */
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  .page { page-break-after: always; }
+  .page:last-of-type { page-break-after: auto; }
+  section.block { page-break-before: always; }
+
+  /* ---------- cover ---------- */
+  .cover {
+    min-height: 245mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: var(--ink);
+    color: var(--bone);
+    padding: 14mm;
+    margin: -16mm -15mm -16mm -15mm;
+  }
+  .cover .kicker {
+    font-size: 9pt; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent-2);
+  }
+  .cover h1 { font-size: 30pt; line-height: 1.02; letter-spacing: -0.01em; margin-top: 6mm; }
+  .cover .sub { color: var(--accent-2); font-size: 13pt; margin-top: 3mm; }
+  .cover .bottom { font-size: 9pt; color: #cfc7bc; border-top: 1px solid rgba(242,239,233,0.25); padding-top: 6mm; }
+
+  /* ---------- headings ---------- */
+  h2 {
+    font-size: 17pt; letter-spacing: 0.01em;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 2.2mm; margin: 0 0 4mm;
+  }
+  h3 { font-size: 13pt; margin: 6mm 0 2mm; color: var(--accent); }
+  h4 { font-size: 11pt; margin: 4mm 0 1.5mm; }
+  p, li { margin-bottom: 1.4mm; }
+  ul, ol { padding-left: 6mm; margin-bottom: 2mm; }
+  li { margin-bottom: 0.8mm; }
+
+  /* ---------- components ---------- */
+  .lead { font-size: 11pt; color: var(--ink-2); margin-bottom: 4mm; }
+  .note {
+    background: #f6efe7; border-left: 4px solid var(--accent);
+    padding: 3mm 4mm; margin: 3mm 0; font-size: 9.5pt;
+  }
+  .note strong { color: var(--accent); }
+  .warn {
+    background: #fdf1ec; border-left: 4px solid #c0392b;
+    padding: 3mm 4mm; margin: 3mm 0; font-size: 9.5pt;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 3mm 0 4mm; font-size: 9pt; }
+  th, td { border: 1px solid #d8d2c9; padding: 1.8mm 2.5mm; text-align: left; vertical-align: top; }
+  th { background: var(--accent); color: #fff; font-weight: 600; }
+  tr:nth-child(even) td { background: #faf7f2; }
+  code {
+    background: #efe9e1; border: 1px solid #ddd5c9; border-radius: 3px;
+    padding: 0 1.3mm; font-family: Consolas, "Courier New", monospace; font-size: 9pt;
+  }
+  .kbd {
+    background: #2c2620; color: #f6f1e9; border-radius: 3px;
+    padding: 0 1.5mm; font-family: Consolas, monospace; font-size: 9pt;
+  }
+  .toc { list-style: none; padding: 0; }
+  .toc li { margin-bottom: 1.7mm; }
+  .toc .lvl2 { font-weight: 700; color: var(--accent); }
+  .toc .lvl3 { padding-left: 7mm; }
+  .path { font-family: Consolas, monospace; font-size: 10pt; color: var(--accent); }
+  .cols { display: flex; gap: 8mm; }
+  .cols > div { flex: 1; }
+  .pagenum { text-align: center; color: var(--ink-2); font-size: 8.5pt; margin-top: 8mm; }
+  .rule-note { font-size: 9.5pt; color: var(--ink-2); font-style: italic; margin-top: 1mm; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div>
+    <div class="kicker">Oddaka Inksters · Bhubaneswar</div>
+    <h1>Website &amp; Admin<br />User Manual</h1>
+    <div class="sub">A plain-language guide to the public website and the studio CMS</div>
+  </div>
+  <div class="bottom">
+    Applies to the Oddaka Inksters production site (React + Supabase).<br />
+    Two parts: <strong>A — Public website</strong> (for visitors &amp; the studio) and <strong>B — Admin CMS</strong> (for the studio owner).
+  </div>
+</div>
+
+<!-- ================= TOC ================= -->
+<div class="page">
+  <h2>Contents</h2>
+  <ol class="toc">
+    <li class="lvl2">Part A — The public website</li>
+    <li class="lvl3">A1. Pages and how to move around · A2. Homepage · A3. Gallery &amp; tattoo detail · A4. Artists · A5. About · A6. Aftercare · A7. Contact &amp; sending an enquiry · A8. Using the site on a phone</li>
+    <li class="lvl2">Part B — The admin area (studio CMS)</li>
+    <li class="lvl3">B1. Signing in · B2. Dashboard · B3. Tattoos · B4. Artists · B5. Styles · B6. Reviews · B7. Offers · B8. Enquiries · B9. Website details · B10. Homepage content · B11. Help &amp; signing out</li>
+    <li class="lvl2">Part C — Running the site</li>
+    <li class="lvl3">C1. Demo mode vs. live mode · C2. Going live (Supabase + Vercel) · C3. Where your data and files live · C4. Troubleshooting</li>
+  </ol>
+  <div class="note"><strong>One minute rule of thumb:</strong> “Published” means it is visible on the public site. “Hidden” or “draft” means only you can see it in the admin. Nothing on the public site is ever edited directly — everything changes through this admin area.</div>
+</div>
+
+<!-- ================= PART A ================= -->
+<div class="page">
+  <h2>Part A — The public website</h2>
+
+  <h3>A1. Pages and how to move around</h3>
+  <p>The public site is the part visitors see at the main URL. It has the following pages:</p>
+  <table>
+    <tr><th>Page</th><th>URL</th><th>What it does</th></tr>
+    <tr><td>Home</td><td><span class="path">/</span></td><td>Landing page: studio intro, offers, featured tattoos, styles, artists, reviews, Instagram grid, booking call-to-action.</td></tr>
+    <tr><td>Gallery</td><td><span class="path">/gallery</span></td><td>Every duty-published tattoo, filterable by style.</td></tr>
+    <tr><td>Tattoo detail</td><td><span class="path">/gallery/tattoo-01</span></td><td>One tattoo: photos, healing video, details and related work. Each tattoo has a permanent, unchanging address.</td></tr>
+    <tr><td>Artists</td><td><span class="path">/artists</span></td><td>The tattoo artists, with their specialties. Click one for the full profile.</td></tr>
+    <tr><td>About</td><td><span class="path">/about</span></td><td>The studio story, standards and hygiene practices.</td></tr>
+    <tr><td>Aftercare</td><td><span class="path">/aftercare</span></td><td>Healing instructions for clients.</td></tr>
+    <tr><td>Contact</td><td><span class="path">/contact</span></td><td>Studio details, opening hours, map and the enquiry form (see A7).</td></tr>
+  </table>
+  <p>The menu bar at the top and the footer at the bottom are the same on every page. On a phone the menu collapses into a button.</p>
+  <p>Every page shows an accurate <em>page title</em> and <em>description</em> in the browser tab and when links are shared (WhatsApp, Instagram, Google). Tattoo pages are automatically indexed by search engines.</p>
+
+  <h3>A2. Homepage</h3>
+  <p>The homepage is the shop window. From top to bottom:</p>
+  <ul>
+    <li><strong>Hero</strong> — the big headline. The studio can change the wording and buttons from the admin (see B10).</li>
+    <li><strong>Scrolling text marquee</strong> — decorative strip.</li>
+    <li><strong>Offers strip</strong> — currently live offers (up to three). This section only appears when there is at least one in-date, published offer (see B7).</li>
+    <li><strong>Featured work</strong> — tattoos marked “Featured” in the admin, in a photo grid.</li>
+    <li><strong>Tattoo styles</strong> — the styles that exist in the admin; each shows how many pieces it contains.</li>
+    <li><strong>Artists</strong> — each artist card shows how many featured pieces they have done.</li>
+    <li><strong>Cover-up slider</strong> — an interactive before/after demo (drag the handle).</li>
+    <li><strong>Process &amp; Why Oddaka</strong> — fixed studio content.</li>
+    <li><strong>Client stories</strong> — up to six published reviews.</li>
+    <li><strong>Instagram grid</strong> — six featured tattoo photos linking to Instagram and the gallery.</li>
+    <li><strong>Final call-to-action</strong> — a big “Book / start your tattoo” button leading to the contact page.</li>
+  </ul>
+
+  <h3>A3. Gallery and tattoo detail</h3>
+  <ul>
+    <li>The gallery shows only <strong>published</strong> tattoos. Style pills at the top filter the list.</li>
+    <li>Click any card to open the tattoo’s page: photo set (click a photo to view full-screen, swipe on a phone), any healing <em>video</em>, a fact panel (style, placement, size, sessions, hours, year, price range if set), the story behind the piece, and related tattoos from the same artist or style.</li>
+    <li>A “Book this style” button sends the visitor to the contact form. If the tattoo belongs to an artist, “Book with [artist]” pre-selects that artist.</li>
+  </ul>
+
+  <h3>A4. Artists</h3>
+  <p>The artists page lists everyone the studio has marked as <em>active</em> in the admin. Opening a profile shows the portrait, biography, specialties, experience and their work. Artist pages only exist for active artists.</p>
+
+  <h3>A5. About &amp; A6. Aftercare</h3>
+  <p>Both are informational pages that the studio keeps current; they need no visitor action.</p>
+
+  <h3>A7. Contact and sending an enquiry</h3>
+  <p>The contact page has the studio phone, WhatsApp, e-mail, physical address, opening hours and a map link on one side, and the enquiry form on the other.</p>
+  <p>The enquiry form collects:</p>
+  <table>
+    <tr><th>Field</th><th>Required?</th><th>Notes</th></tr>
+    <tr><td>Your name</td><td>Yes</td><td></td></tr>
+    <tr><td>WhatsApp number</td><td>Yes</td><td>The studio replies here.</td></tr>
+    <tr><td>Email</td><td>Yes</td><td></td></tr>
+    <tr><td>Preferred artist</td><td>No</td><td>Drop-down of active artists, or “No preference”.</td></tr>
+    <tr><td>Tattoo idea</td><td>Yes</td><td>Free text.</td></tr>
+    <tr><td>Tattoo style / Body placement / Approx. size</td><td>No</td><td>Pick lists. “Not decided” / “Flexible” are fine.</td></tr>
+    <tr><td>Preferred date</td><td>No</td><td>A date picker.</td></tr>
+    <tr><td>Budget range</td><td>No</td><td>Pick list or “Flexible”.</td></tr>
+    <tr><td>Reference image</td><td>No</td><td>Optional photo of the idea. <strong>This image is private</strong> — only the studio sees it.</td></tr>
+  </table>
+  <p>When the visitor taps “Send enquiry”, the lead lands in the studio’s admin Enquiries inbox (B8). The form confirms the submission; the studio usually replies on WhatsApp within a day.</p>
+  <p class="rule-note">Required fields are flagged as you type. If something is wrong, a friendly message appears next to the field — nothing is lost.</p>
+</div>
+
+<div class="page">
+  <h3>A8. Using the site on a phone</h3>
+  <ul>
+    <li>The whole site is designed mobile-first: menus collapse, photo grids go single-column, and the enquiry form is easy to fill on a phone.</li>
+    <li>Photos open a full-screen lightbox; pinch or swipe to move between pictures.</li>
+    <li>Videos play inline and full-screen-capable.</li>
+    <li>If a tattoo that was open is unpublished (removed) by the studio, visitors see a friendly “not found” page instead of an error.</li>
+  </ul>
+  <div class="warn"><strong>What can go wrong on the public site:</strong> if a required service (e.g. the live database) is briefly unreachable, pages show a calm “Something went wrong loading” message with a refresh. This is rare and self-heals.</div>
+</div>
+
+<!-- ================= PART B ================= -->
+<section class="block">
+  <h2>Part B — The admin area (studio CMS)</h2>
+
+  <h3>B1. Signing in</h3>
+  <ul>
+    <li>Open <span class="path">/admin/login</span> on your website (e.g. <code>yourdomain.com/admin/login</code>).</li>
+    <li>Enter the e-mail and password the studio uses (created once when the site goes live). Tap <strong>Sign in</strong>.</li>
+    <li>The session is remembered on that browser (Time —— you stay signed in until you sign out).</li>
+    <li>If you forget the password, use the <strong>“Forgot password?”</strong> link on the login screen — a reset link is e-mailed to you, and it works straight from your phone.</li>
+  </ul>
+  <div class="note"><strong>Demo mode (no password needed):</strong> until the site is connected to a live database, the admin runs in a “demo” mode where the screen shows sample login details pre-filled. Tap “Sign in” to browse every admin screen. Changes are only saved in the demo environment, which is fine for learning the layout. See Part C.</div>
+  <p>Only the studio staff can get past the login screen. Every admin page is protected automatically.</p>
+
+  <h3>B2. Dashboard</h3>
+  <p>The first screen after signing in. It summarises the whole studio at a glance:</p>
+  <ul>
+    <li><strong>Counters</strong> — published tattoos, number of artists, new enquiries waiting, featured pieces, and how many tattoos are in the “been sketched but not approved” drafts.</li>
+    <li><strong>Backend status</strong> — shows whether the site is in live (Supabase) or demo mode.</li>
+    <li><strong>Latest enquiries</strong> — the newest leads with their status, so you never miss a booking.</li>
+    <li><strong>Quick actions</strong> — one-tap shortcuts to add a tattoo, open enquiries, or edit the homepage.</li>
+  </ul>
+
+  <h3>B3. Tattoos</h3>
+  <p><strong>List screen (Tattoos in the menu):</strong> every tattoo as a card with its cover photo, title, artist, style and two switches:</p>
+  <table>
+    <tr><th>Switch</th><th>What it does</th></tr>
+    <tr><td><strong>Published</strong></td><td><span class="kbd">ON</span> = the tattoo appears on the public site (gallery, search engines, artist page). <span class="kbd">OFF</span> = invisible to everyone except the admin.</td></tr>
+    <tr><td><strong>Featured</strong></td><td><span class="kbd">ON</span> = the tattoo can appear on the homepage featured grid and in the Instagram strip.</td></tr>
+  </table>
+  <p>Use the <strong>Edit</strong> pencil to change the piece or the trash icon to delete it (deletion is immediate — you are asked to confirm first).</p>
+  <p><strong>Add or edit a tattoo (button “Add tattoo” / Edit):</strong></p>
+  <table>
+    <tr><th>Field</th><th>What it’s for</th></tr>
+    <tr><td>Title *</td><td>Shown on the card and page. Make it the design’s name (e.g. “Ember Veil”).</td></tr>
+    <tr><td>Artist</td><td>Who drew it. Drives “related work” and the artist’s page.</td></tr>
+    <tr><td>Style</td><td>Free-text style label (e.g. “Fine line”).</td></tr>
+    <tr><td>Category (Style filter)</td><td>Pick from the Styles you manage in B5. This decides which gallery filter the piece appears under.</td></tr>
+    <tr><td>Placement, Size, Price, Sessions, Hours (duration), Year</td><td>Public fact panel. Left blank where unknown.</td></tr>
+    <tr><td>Description *</td><td>The story behind the piece — shown on the detail page.</td></tr>
+    <tr><td>Design notes</td><td>Internal note about the design (shown publicly on the detail page).</td></tr>
+    <tr><td>Published / Featured</td><td>The two visibility switches described above.</td></tr>
+  </table>
+  <h4>Photos, video and the cover</h4>
+  <p>The media manager is the heart of the tattoo screen:</p>
+  <ol>
+    <li><strong>Add photos</strong> — tap to choose photos (from your phone gallery or computer). Up to 8&nbsp;MB each; add as many as you like.</li>
+    <li><strong>Reorder</strong> — drag the left/right arrows to change the order; the first photo is the thumbnail on cards.</li>
+    <li><strong>Set the cover</strong> — tap the star on any photo to mark it as the card thumbnail. A gold star shows which one is active.</li>
+    <li><strong>Replace</strong> — each photo has remove (trash) and replace buttons; replacing swaps the file without breaking the page.</li>
+    <li><strong>Add a video</strong> — a healing/video of the piece. You can upload a video file (up to ~200&nbsp;MB) or paste a link. The studio-picked cover image is used as the video poster.</li>
+    <li><strong>Save</strong> — everything (photo ordering, cover, removed files) is written to the site’s storage in one go. A toast on screen confirms success or explains the problem in plain words.</li>
+  </ol>
+  <div class="note"><strong>Publishing tip:</strong> save the tattoo first as a draft (<span class="kbd">Published OFF</span>), review it on the front of the site, then flip Published ON when happy. A counter on the dashboard shows how many drafts are waiting.</div>
+</section>
+
+<section class="block">
+  <h3>B4. Artists</h3>
+  <ul>
+    <li><strong>Add artist</strong> — name, role, short bio, full bio, specialties, experience in years, Instagram username, and a <strong>portrait photo</strong> (uploaded through the same file picker).</li>
+    <li><strong>Active switch</strong> — <span class="kbd">ON</span> shows the artist on the public Artists page and allows them to be selected on the contact form. <span class="kbd">OFF</span> removes them from the public site but keeps their profile for later.</li>
+    <li><strong>Featured switch</strong> — highlights a lead artist where the design calls for it.</li>
+    <li>Edit and delete work like tattoos (confirm before deleting).</li>
+  </ul>
+
+  <h3>B5. Styles (gallery categories)</h3>
+  <p>These become the filter pills on the gallery. You can:</p>
+  <ul>
+    <li><strong>Add a style</strong> — e.g. “Ornamental”, “Realism”, “Blackwork”.</li>
+    <li><strong>Hide a style</strong> — it stops appearing publicly (use instead of deleting, so existing tattoos keep their style quietly).</li>
+    <li><strong>Reorder</strong> — move styles up/down to set the order the pills appear.</li>
+    <li><strong>Delete</strong> — removes the style and its tattoos move to “uncategorised” (they stay published).</li>
+  </ul>
+
+  <h3>B6. Reviews (client stories)</h3>
+  <ul>
+    <li><strong>Add review</strong> — client name, the review text, the tattoo style it relates to (and optionally which tattoo), and a star rating (1–5).</li>
+    <li><strong>Published switch</strong> — drafts stay hidden until you approve them; the homepage shows up to six published reviews.</li>
+    <li><strong>Featured</strong> — controls prominence/heart ordering on the testimonial cards.</li>
+  </ul>
+
+  <h3>B7. Offers</h3>
+  <ul>
+    <li><strong>Add offer</strong> — title, description, optional image, button label, and where the button goes (usually the contact page).</li>
+    <li><strong>Start / end dates</strong> — optional. An offer is shown to the public only while today is inside its date window; leave both empty for an evergreen offer.</li>
+    <li><strong>Published switch</strong> — the master on/off. A drafted offer never appears.</li>
+    <li>Up to three live offers appear on the homepage offers strip; all live offers appear on their own public section.</li>
+  </ul>
+
+  <h3>B8. Enquiries (the inbox)</h3>
+  <p>Every contact-form submission lands here, newest first, with the name, phone / WhatsApp number, e-mail, the idea, and the details chosen on the form.</p>
+  <ul>
+    <li><strong>Status pipeline</strong> — move each lead through its lifecycle. The dashboard counts “new” ones so nothing sits.</li>
+    <li><strong>Filter bar</strong> — show only New, or filter by any status, to focus.</li>
+    <li><strong>WhatsApp reply</strong> — each enquiry has a button that opens WhatsApp to that number with the enquiry pre-loaded — reply instantly.</li>
+    <li><strong>Reference photo</strong> — if the visitor attached one, a small thumbnail opens a full-size viewer. It is stored privately.</li>
+    <li><strong>Delete</strong> — remove a lead (confirm first).</li>
+  </ul>
+  <table>
+    <tr><th>Status</th><th>Meaning</th></tr>
+    <tr><td>New</td><td>Just arrived — needs attention.</td></tr>
+    <tr><td>Contacted</td><td>We reached out.</td></tr>
+    <tr><td>Consultation</td><td>Booked or held a consultation.</td></tr>
+    <tr><td>Booked</td><td>Hey are tattoo session is booked.</td></tr>
+    <tr><td>Completed</td><td>Work done and healed-out.</td></tr>
+    <tr><td>Cancelled</td><td>Did not go ahead.</td></tr>
+    <tr><td>Archived</td><td>Greyed out / tucked away — nothing further to do.</td></tr>
+  </table>
+
+  <h3>B9. Website details</h3>
+  <p>One screen for the studio’s identity used across the whole site:</p>
+  <ul>
+    <li><strong>Business</strong> — studio name and tagline.</li>
+    <li><strong>Contact</strong> — WhatsApp number (used by the enquiry reply button), phone, e-mail, postal address and Google Maps link.</li>
+    <li><strong>Opening hours</strong> — per weekday: opening time, closing time, or “closed” for that day.</li>
+    <li><strong>Social links</strong> — Instagram handle/URL (the sitewide “Follow” buttons), optional Facebook and YouTube.</li>
+  </ul>
+  <p>Save applies the changes across the site immediately.</p>
+</section>
+
+<section class="block">
+  <h3>B10. Homepage content</h3>
+  <p>This screen lets you rewrite the homepage copy without touching code:</p>
+  <table>
+    <tr><th>Section</th><th>Editable fields</th></tr>
+    <tr><td>Hero</td><td>Heading (start a new line to split the two-line look), subheading, and the two button labels.</td></tr>
+    <tr><td>Featured work</td><td>Heading + description above the featured grid.</td></tr>
+    <tr><td>Studio</td><td>Heading + description for the “why” text.</td></tr>
+    <tr><td>Final call-to-action</td><td>Heading, description and button label at the bottom of the home page.</td></tr>
+  </table>
+  <div class="note"><strong>Split a heading:</strong> type a line break (Enter) inside the hero heading field — each line is styled as a separate banner line. While you edit, you can leave and come back; only “Save” applies it.</div>
+
+  <h3>B11. Help &amp; signing out</h3>
+  <ul>
+    <li>The <strong>Help</strong> page in the admin explains each section, the publish rules and the demo/live modes.</li>
+    <li>Sign out from the sidebar at any time. This is also the safest way to leave a shared phone.</li>
+  </ul>
+  <div class="warn"><strong>Private data warning:</strong> enquiries and reference photos are never shown on the public site. Only signed-in staff can see them. Do not share your admin password, and never put it in a message.</div>
+</section>
+
+<!-- ================= PART C ================= -->
+<section class="block">
+  <h2>Part C — Running the site</h2>
+
+  <h3>C1. Demo mode vs. live mode</h3>
+  <table>
+    <tr><th></th><th>Demo mode (no database)</th><th>Live mode (Supabase, production)</th></tr>
+    <tr><td>Starts when</td><td>No live keys are configured on the server</td><td>The live keys are configured</td></tr>
+    <tr><td>Where data lives</td><td>This browser only (protected storage in the browser)</td><td>The studio’s cloud database</td></tr>
+    <tr><td>Who sees admin changes</td><td>Only this device/browser</td><td>Everywhere — the public site updates instantly</td></tr>
+    <tr><td>Good for</td><td>Learning the admin, design review</td><td>Real customers, real bookings, real media</td></tr>
+    <tr><td>Can it be mistaken for live?</td><td>Yes — the dashboard visibly prints “Demo mode” so the studio can’t be fooled.</td><td>Dashboard prints “Live” status.</td></tr>
+  </table>
+
+  <h3>C2. Going live (one-time setup, ~30 minutes)</h3>
+  <ol>
+    <li><strong>Create a Supabase project</strong> at supabase.com (free tier is enough to start).</li>
+    <li><strong>Apply the database schema</strong> — open the SQL Editor, paste the contents of <code>supabase/schema.sql</code> (in the project files), and run it. This creates all tables, security rules, storage buckets and helper functions.</li>
+    <li><strong>Add the studio login</strong> — under Supabase “Authentication → Users”, create the studio e-mail account. It is automatically given the admin role.</li>
+    <li><strong>(Optional) load the demo content</strong> — run <span class="kbd">npm run db:seed</span> with the project’s server-side key to import the starter portfolio, artists, styles, reviews, offers and default website text. (PowerShell example in the README.)</li>
+    <li><strong>Configure the site</strong> — set two environment values on the host: <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> (from Supabase → Project settings → API).</li>
+    <li><strong>Deploy on Vercel</strong> — connect the repository, add those two values under Environment Variables, deploy. Your site (and <code>/admin</code>) is now live at your domain.</li>
+  </ol>
+  <p>Full, copy-paste instructions live in the repository <code>README.md</code>.</p>
+
+  <h3>C3. Where your data and files live</h3>
+  <ul>
+    <li><strong>Tables</strong> (Supabase Postgres): tattoos, tattoo images, tattoo videos, artists, categories, reviews, enquiries, offers, site settings.</li>
+    <li><strong>Files</strong> (Supabase Storage buckets): <code>tattoos</code>, <code>artists</code>, <code>reviews</code>, <code>website</code> are public; <code>enquiries</code> is private (reference photos).</li>
+    <li><strong>Rules of thumb:</strong> public visitors can only read <em>published/in-date/active</em> records; enquiries are write-only from the public form and read-only in admin; the admin can edit everything.</li>
+    <li>Tattoo URLs never break: each tattoo keeps a stable name (e.g. <code>/gallery/tattoo-07</code>) even after photos are replaced.</li>
+  </ul>
+
+  <h3>C4. Troubleshooting</h3>
+  <table>
+    <tr><th>Symptom</th><th>Likely cause &amp; fix</th></tr>
+    <tr><td>Admin falls back to “Demo mode”</td><td>The two environment values are missing/empty on the host. Add them and redeploy (C2 step 5).</td></tr>
+    <tr><td>Can’t sign in</td><td>The studio account isn’t in Supabase “Authentication → Users”, or its admin role wasn’t applied. Check the README step 3.</td></tr>
+    <tr><td>Public page says “Something went wrong”</td><td>Usually a missing migration or table. Run <code>schema.sql</code> again, then hard-refresh.</td></tr>
+    <tr><td>Photo/video won’t upload</td><td>File too large (images &gt; 8&nbsp;MB, videos &gt; ~200&nbsp;MB), or storage buckets/policies weren’t created — re-run <code>schema.sql</code>.</td></tr>
+    <tr><td>A removed tattoo still shows</td><td>Published is still ON for it, or the browser cache — flip Published OFF (B3) and refresh the public page.</td></tr>
+  </table>
+
+  <p class="pagenum">Oddaka Inksters — Website &amp; Admin User Manual</p>
+</section>
+
+</body>
+</html>

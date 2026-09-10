@@ -19,6 +19,6 @@ export const DEMO_ADMIN = {
   password: 'inkster-demo',
 }
 
-export const ENQUIRY_STATUSES = ['NEW', 'CONTACTED', 'CONSULTATION', 'BOOKED', 'COMPLETED']
+export const ENQUIRY_STATUSES = ['NEW', 'CONTACTED', 'CONSULTATION', 'BOOKED', 'COMPLETED', 'CANCELLED', 'ARCHIVED']
 
 export const BUDGET_RANGES = ['Under ₹5k', '₹5k – ₹10k', '₹10k – ₹20k', '₹20k – ₹50k', '₹50k+']

@@ -12,10 +12,16 @@ import NotFound from './pages/public/NotFound.jsx'
 import TattooDetail from './pages/public/TattooDetail.jsx'
 import AdminDashboard from './pages/admin/AdminDashboard.jsx'
 import AdminArtists from './pages/admin/AdminArtists.jsx'
+import AdminCategories from './pages/admin/AdminCategories.jsx'
 import AdminEnquiries from './pages/admin/AdminEnquiries.jsx'
+import AdminHelp from './pages/admin/AdminHelp.jsx'
 import AdminLogin from './pages/admin/AdminLogin.jsx'
+import AdminOffers from './pages/admin/AdminOffers.jsx'
+import AdminReviews from './pages/admin/AdminReviews.jsx'
 import AdminTattooForm from './pages/admin/AdminTattooForm.jsx'
 import AdminTattoos from './pages/admin/AdminTattoos.jsx'
+import AdminWebsite from './pages/admin/AdminWebsite.jsx'
+import AdminWebsiteHomepage from './pages/admin/AdminWebsiteHomepage.jsx'
 import { AdminDataProvider } from './context/AdminDataContext.jsx'
 import { useAuth } from './context/AuthContext.jsx'
 
@@ -55,7 +61,13 @@ function App() {
         <Route path="tattoos/new" element={<AdminTattooForm />} />
         <Route path="tattoos/:id/edit" element={<AdminTattooForm />} />
         <Route path="artists" element={<AdminArtists />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="reviews" element={<AdminReviews />} />
+        <Route path="offers" element={<AdminOffers />} />
         <Route path="enquiries" element={<AdminEnquiries />} />
+        <Route path="website" element={<AdminWebsite />} />
+        <Route path="website/homepage" element={<AdminWebsiteHomepage />} />
+        <Route path="help" element={<AdminHelp />} />
       </Route>
     </Routes>
   )

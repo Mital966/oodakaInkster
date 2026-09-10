@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion'
-import { ArrowRight, ChevronLeft, Clock, Layers, Maximize2, Ruler } from 'lucide-react'
+import { ArrowRight, ChevronLeft, Layers, Maximize2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Button from '../../components/common/Button'

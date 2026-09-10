@@ -1,18 +1,19 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eye, EyeOff, Fingerprint, Info, LogIn } from 'lucide-react'
+import { Cloud, Eye, EyeOff, Fingerprint, Info, LogIn } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { DEMO_ADMIN } from '../../config/site'
 import { useAuth } from '../../context/AuthContext'
 
 function AdminLogin() {
-  const { user, login } = useAuth()
+  const { user, login, resetPassword, remoteConfigured } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState(DEMO_ADMIN.email)
-  const [password, setPassword] = useState(DEMO_ADMIN.password)
+  const [email, setEmail] = useState(remoteConfigured ? '' : DEMO_ADMIN.email)
+  const [password, setPassword] = useState(remoteConfigured ? '' : DEMO_ADMIN.password)
   const [showPass, setShowPass] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
 
   const from = location.state?.from?.pathname || '/admin/dashboard'
@@ -22,10 +23,25 @@ function AdminLogin() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setNotice('')
     setBusy(true)
     const res = await login({ email, password })
     setBusy(false)
     if (res.ok) navigate(from, { replace: true })
+    else setError(res.error)
+  }
+
+  async function handleReset() {
+    setError('')
+    setNotice('')
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('Enter the admin email address first.')
+      return
+    }
+    setBusy(true)
+    const res = await resetPassword(email.trim())
+    setBusy(false)
+    if (res.ok) setNotice('If that email exists, a password-reset link is on its way.')
     else setError(res.error)
   }
 
@@ -50,7 +66,7 @@ function AdminLogin() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold text-neutral-700">Email</span>
               <input
@@ -83,6 +99,16 @@ function AdminLogin() {
               </div>
             </label>
 
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="text-xs font-semibold text-neutral-500 transition-colors hover:text-neutral-900"
+              >
+                Forgot password?
+              </button>
+            </div>
+
             <AnimatePresence>
               {error && (
                 <motion.p
@@ -92,6 +118,16 @@ function AdminLogin() {
                   className="text-xs text-red-600"
                 >
                   {error}
+                </motion.p>
+              )}
+              {notice && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="text-xs text-emerald-600"
+                >
+                  {notice}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -107,14 +143,21 @@ function AdminLogin() {
 
           <div className="mt-6 flex items-start gap-2.5 rounded-md bg-neutral-50 p-3.5 ring-1 ring-inset ring-neutral-200">
             <Info size={14} className="mt-0.5 shrink-0 text-neutral-400" />
-            <p className="text-xs leading-relaxed text-neutral-500">
-              Prototype sign-in. Demo credentials are pre-filled — just press sign in. This will be
-              replaced with real authentication in Part 2.
-            </p>
+            {remoteConfigured ? (
+              <p className="text-xs leading-relaxed text-neutral-500">
+                Connected to Supabase. Use the studio admin account created during setup.
+              </p>
+            ) : (
+              <p className="text-xs leading-relaxed text-neutral-500">
+                Demo mode running — your sign-in details are pre-filled, just press Sign in. When
+                Supabase is configured this becomes your real admin login.
+              </p>
+            )}
           </div>
         </div>
-        <p className="mt-6 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-400">
-          Oddaka Inksters · Prototype build
+        <p className="mt-6 flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-400">
+          {remoteConfigured ? <Cloud size={11} /> : <Fingerprint size={11} />}
+          Oddaka Inksters · {remoteConfigured ? 'Production build' : 'Demo build'}
         </p>
       </motion.div>
     </div>

@@ -11,7 +11,7 @@ import TattooCard from '../../components/public/TattooCard'
 import TestimonialCard from '../../components/public/TestimonialCard'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getArtists, getCategories, getFeaturedTattoos, getReviews, getTattoos } from '../../data/dataService'
+import { getArtists, getCategories, getFeaturedTattoos, getOffers, getReviews, getSettings, getTattoos } from '../../data/dataService'
 import { useDataQuery } from '../../hooks/useDataQuery'
 import { cn } from '../../utils/cn'
 import { SITE } from '../../config/site'
@@ -21,8 +21,8 @@ const CONTAINER = 'mx-auto max-w-8xl px-6 lg:px-10'
 function useHomeData() {
   return useDataQuery(
     () =>
-      Promise.all([getFeaturedTattoos(), getArtists(), getReviews(), getCategories(), getTattoos()]).then(
-        ([featured, artists, reviews, categories, tattoos]) => ({ featured, artists, reviews, categories, tattoos }),
+      Promise.all([getFeaturedTattoos(), getArtists(), getReviews(), getCategories(), getTattoos(), getOffers(), getSettings()]).then(
+        ([featured, artists, reviews, categories, tattoos, offers, settings]) => ({ featured, artists, reviews, categories, tattoos, offers, settings }),
       ),
     [],
   )
@@ -37,7 +37,9 @@ const heroLine = {
   }),
 }
 
-function Hero() {
+function Hero({ settings }) {
+  const hero = settings?.homepage?.hero
+  const headingLines = (hero?.heading || 'YOUR STORY.\nPERMANENTLY INKED.').split('\n').filter(Boolean)
   return (
     <section className="relative flex min-h-screen flex-col justify-end overflow-hidden">
       <img
@@ -77,18 +79,18 @@ function Hero() {
         </motion.p>
 
         <h1 className="mt-6 font-display text-[2.9rem] font-black uppercase leading-[0.95] tracking-tight text-bone sm:text-7xl lg:text-[5.4rem]">
-          <motion.span variants={heroLine} initial="hidden" animate="show" custom={1} className="block">
-            Your story.
-          </motion.span>
-          <motion.span
-            variants={heroLine}
-            initial="hidden"
-            animate="show"
-            custom={2}
-            className="block text-outline-strong"
-          >
-            Permanently inked.
-          </motion.span>
+          {headingLines.map((line, i) => (
+            <motion.span
+              key={i}
+              variants={heroLine}
+              initial="hidden"
+              animate="show"
+              custom={i + 1}
+              className={cn('block', i > 0 && 'text-outline-strong')}
+            >
+              {line}
+            </motion.span>
+          ))}
         </h1>
 
         <motion.p
@@ -98,8 +100,8 @@ function Hero() {
           animate="show"
           custom={3}
         >
-          Custom tattoos · Fine line · Realism · Blackwork · Cover-ups. Designed around you, drawn
-          by hand, made to last.
+          {hero?.subheading ||
+            'Custom tattoos · Fine line · Realism · Blackwork · Cover-ups. Designed around you, drawn by hand, made to last.'}
         </motion.p>
 
         <motion.div
@@ -110,10 +112,10 @@ function Hero() {
           custom={4}
         >
           <Button size="lg" to="/contact">
-            Book a Consultation <ArrowRight size={15} />
+            {hero?.ctaPrimary || 'Book a Consultation'} <ArrowRight size={15} />
           </Button>
           <Button size="lg" variant="outline" to="/gallery">
-            Explore Our Work
+            {hero?.ctaSecondary || 'Explore Our Work'}
           </Button>
         </motion.div>
       </div>
@@ -156,6 +158,42 @@ function Marquee() {
         ))}
       </div>
     </div>
+  )
+}
+
+function OffersStrip({ offers }) {
+  if (!offers || offers.length === 0) return null
+  return (
+    <section className={cn(CONTAINER, 'py-16 lg:py-20')}>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {offers.slice(0, 3).map((o, i) => (
+          <Reveal key={o.id} delay={i * 0.06} y={16}>
+            <Link
+              to={o.ctaUrl || '/contact'}
+              className="group flex h-full flex-col justify-between gap-6 border border-[#b3541e]/40 bg-ink-900/50 p-7 transition-colors hover:border-[#e07a3f]"
+            >
+              {o.image && (
+                <img src={o.image} alt="" className="aspect-video w-full rounded-sm object-cover" />
+              )}
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wide3 text-[#e07a3f]">
+                  Latest offer
+                </p>
+                <h3 className="mt-2 font-display text-2xl font-bold uppercase tracking-tight text-bone">
+                  {o.title}
+                </h3>
+                {o.description && (
+                  <p className="mt-3 text-sm leading-relaxed text-ink-300">{o.description}</p>
+                )}
+                <p className="mt-4 font-mono text-[10px] uppercase tracking-wide3 text-ink-400 underline-offset-4 transition-colors group-hover:text-bone group-hover:underline">
+                  {o.ctaLabel || 'Enquire now'} →
+                </p>
+              </div>
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -350,7 +388,7 @@ function CoverSlider() {
                   </div>
                 ))}
               </dl>
-              <Button to="/gallery/7" variant="outline">
+              <Button to="/gallery/tattoo-07" variant="outline">
                 <Eye size={15} /> See the full project
               </Button>
             </div>
@@ -525,7 +563,7 @@ function Home() {
     )
   }
 
-  const { featured, artists, reviews, categories, tattoos } = data
+  const { featured, artists, reviews, categories, tattoos, offers, settings } = data
   const artistName = (id) => artists.find((a) => a.id === id)?.name || 'Oddaka'
   const featuredByArtist = featured.reduce((acc, t) => {
     acc[t.artistId] = (acc[t.artistId] || 0) + 1
@@ -538,8 +576,9 @@ function Home() {
 
   return (
     <Page title="Oddaka Inksters | Premium Tattoo Studio" className="overflow-x-clip">
-      <Hero />
+      <Hero settings={settings} />
       <Marquee />
+      {offers?.length > 0 && <OffersStrip offers={offers} />}
       <FeaturedWork featured={featured} artistName={artistName} />
       <StylesSection categories={categories} tattooCounts={tattooCounts} />
       <ArtistsSection artists={artists} featuredByArtist={featuredByArtist} />
@@ -549,8 +588,12 @@ function Home() {
       <StoriesSection reviews={reviews.slice(0, 6)} />
       <InstaGrid featured={featured} />
       <CTASection
-        title="Ready to get inked?"
-        text="Tell us your idea. We'll help turn it into something permanent."
+        title={settings?.homepage?.cta?.heading || 'Ready to get inked?'}
+        text={
+          settings?.homepage?.cta?.description ||
+          "Tell us your idea. We'll help turn it into something permanent."
+        }
+        buttonLabel={settings?.homepage?.cta?.buttonLabel || 'Start Your Tattoo'}
       />
     </Page>
   )

@@ -1,22 +1,27 @@
 import { AnimatePresence } from 'framer-motion'
 import { Pencil, Plus, Trash2, Users } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import ConfirmModal from '../../components/admin/ConfirmModal'
 import FormField, { inputCls } from '../../components/admin/FormField'
+import Toggle from '../../components/admin/Toggle'
+import UploadDropzone from '../../components/admin/UploadDropzone'
+import { useToast } from '../../components/admin/Toast'
 import Modal from '../../components/common/Modal'
 import { useAdminData } from '../../context/AdminDataContext'
 import { cn } from '../../utils/cn'
+import { uploadArtistPortrait } from '../../data/dataService'
 
-const EMPTY = { name: '', role: '', specialties: '', experienceYears: '', shortBio: '' }
+const EMPTY = { name: '', role: '', specialties: '', experienceYears: '', shortBio: '', instagram: '' }
 
 function AdminArtists() {
   const { artists, tattoos, addArtist, updateArtist, deleteArtist } = useAdminData()
+  const { toast } = useToast()
   const [editing, setEditing] = useState(null) // null (hidden) | 'new' | artist object
   const [draft, setDraft] = useState(EMPTY)
-  const [portrait, setPortrait] = useState(null) // {url, kind}
+  const [portrait, setPortrait] = useState(null) // {url, kind, file?}
   const [errors, setErrors] = useState({})
+  const [busy, setBusy] = useState(false)
   const [toDelete, setToDelete] = useState(null)
-  const portraitRef = useRef(null)
 
   const worksFor = (id) => tattoos.filter((t) => t.artistId === id).length
 
@@ -31,23 +36,18 @@ function AdminArtists() {
     setDraft({
       name: artist.name,
       role: artist.role,
-      specialties: artist.specialties.join(', '),
-      experienceYears: artist.experienceYears,
+      specialties: artist.specialties?.join(', ') || '',
+      experienceYears: artist.experienceYears == null ? '' : String(artist.experienceYears),
       shortBio: artist.shortBio,
+      instagram: artist.instagram || '',
     })
     setPortrait(artist.portrait ? { url: artist.portrait, kind: 'existing' } : null)
     setErrors({})
-    setEditing(artist)
+    setEditing({ ...artist, _showActive: artist.isActive !== false })
   }
 
   function set(key) {
     return (e) => setDraft((d) => ({ ...d, [key]: e.target.value }))
-  }
-
-  function onPickPortrait(e) {
-    const f = e.target.files?.[0]
-    if (f) setPortrait({ url: URL.createObjectURL(f), kind: 'file', name: f.name })
-    if (portraitRef) portraitRef.value = ''
   }
 
   async function handleSave() {
@@ -55,19 +55,63 @@ function AdminArtists() {
     if (!draft.name.trim()) e.name = 'Name is required'
     if (!draft.specialties.trim()) e.specialties = 'Add at least one specialty'
     setErrors(e)
-    if (Object.keys(e).length) return
+    if (Object.keys(e).length) {
+      toast('error', 'A couple of details are missing for this artist.')
+      return
+    }
 
+    setBusy(true)
+    const isNew = editing === 'new'
     const payload = {
       name: draft.name.trim(),
       role: draft.role.trim(),
       specialties: draft.specialties.split(',').map((s) => s.trim()).filter(Boolean),
-      experienceYears: draft.experienceYears.trim(),
+      experienceYears: String(draft.experienceYears ?? '').trim() || null,
       shortBio: draft.shortBio.trim(),
-      portrait: portrait?.url ?? null,
+      instagram: draft.instagram.trim() || '',
+      isActive: editing?._showActive ?? true,
     }
-    if (editing === 'new') addArtist(payload)
-    else updateArtist(editing.id, payload)
-    setEditing(null)
+    if (portrait?.kind === 'existing') payload.portrait = portrait.url
+    else if (portrait?.kind === 'file') payload.newPortrait = portrait.file
+
+    try {
+      let saved = null
+      if (isNew) {
+        saved = await addArtist(payload)
+      } else {
+        saved = await updateArtist(editing.id, payload)
+      }
+      if (payload.newPortrait) {
+        saved = await uploadArtistPortrait(saved.id, payload.newPortrait)
+      }
+      toast('success', isNew ? `${saved.name} was added to the studio.` : `Changes to ${saved.name} were saved.`)
+      setEditing(null)
+    } catch (err) {
+      toast('error', err.message || 'We couldn’t save the artist. Please try again.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function toggleActive(artist) {
+    try {
+      await updateArtist(artist.id, { isActive: artist.isActive !== false ? false : true })
+      toast('success', artist.isActive !== false ? `${artist.name} is hidden from the public site.` : `${artist.name} is back on the public site.`)
+    } catch (err) {
+      toast('error', err.message || 'There was a problem updating this artist.')
+    }
+  }
+
+  async function handleDelete() {
+    if (!toDelete) return
+    try {
+      await deleteArtist(toDelete.id)
+      toast('success', `${toDelete.name} was removed from the studio.`)
+      setToDelete(null)
+    } catch (err) {
+      toast('error', err.message || 'We couldn’t remove that artist.')
+      setToDelete(null)
+    }
   }
 
   return (
@@ -88,7 +132,7 @@ function AdminArtists() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {artists.map((a) => (
-          <div key={a.id} className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
+          <div key={a.id} className={cn('overflow-hidden rounded-lg border bg-white shadow-sm', a.isActive === false ? 'border-dashed border-neutral-300 opacity-70' : 'border-neutral-200')}>
             <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
               {a.portrait ? (
                 <img src={a.portrait} alt="" className="h-full w-full object-cover" />
@@ -109,19 +153,27 @@ function AdminArtists() {
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {a.specialties.map((s) => (
+                {a.specialties?.map((s) => (
                   <span key={s} className="rounded-full border border-neutral-200 px-2.5 py-0.5 text-xs text-neutral-600">{s}</span>
                 ))}
               </div>
-              <div className="mt-5 flex gap-2 border-t border-neutral-100 pt-4">
-                <button type="button" onClick={() => openEdit(a)} className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 transition-colors hover:bg-neutral-50">
-                  <Pencil size={12} /> Edit
-                </button>
-                {!worksFor(a.id) && (
-                  <button type="button" onClick={() => setToDelete(a)} className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50">
-                    <Trash2 size={12} /> Remove
+              <div className="mt-5 flex items-center justify-between gap-2 border-t border-neutral-100 pt-4">
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => openEdit(a)} className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 transition-colors hover:bg-neutral-50">
+                    <Pencil size={12} /> Edit
                   </button>
-                )}
+                  {!worksFor(a.id) && (
+                    <button type="button" onClick={() => setToDelete(a)} className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50">
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-neutral-500">
+                  <Toggle on={a.isActive !== false} onChange={() => toggleActive(a)} label={`Toggle visibility for ${a.name}`} />
+                  <span className={cn('font-semibold', a.isActive === false ? 'text-neutral-400' : 'text-emerald-600')}>
+                    {a.isActive === false ? 'Hidden' : 'Visible'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -131,29 +183,19 @@ function AdminArtists() {
       <AnimatePresence>
         <Modal
           open={editing !== null}
-          onClose={() => setEditing(null)}
+          onClose={() => !busy && setEditing(null)}
           title={editing === 'new' ? 'Add artist' : `Edit ${editing?.name}`}
           width="max-w-xl"
         >
           <div className="space-y-5">
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => portraitRef?.click()}
-                className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-md bg-neutral-100 text-neutral-400 ring-1 ring-neutral-200 hover:ring-neutral-400"
-              >
-                {portrait ? (
-                  <>
-                    <img src={portrait.url} alt="" className="h-full w-full object-cover" />
-                    <span className="absolute inset-0 flex items-center justify-center bg-neutral-900/50 text-[10px] font-semibold text-white opacity-0 transition-opacity hover:opacity-100">
-                      Change
-                    </span>
-                  </>
-                ) : (
-                  <Plus size={18} />
-                )}
-              </button>
-              <div className="grid flex-1 gap-4">
+            <div className="grid gap-5 sm:grid-cols-[8rem_1fr]">
+              <UploadDropzone
+                value={portrait}
+                onChange={setPortrait}
+                label="Add a portrait"
+                previewClass="aspect-square"
+              />
+              <div className="grid gap-4">
                 <FormField label="Full name *" error={errors.name}>
                   <input className={cn(inputCls, errors.name && 'border-red-400')} value={draft.name} onChange={set('name')} />
                 </FormField>
@@ -167,20 +209,25 @@ function AdminArtists() {
               <input className={cn(inputCls, errors.specialties && 'border-red-400')} value={draft.specialties} onChange={set('specialties')} />
             </FormField>
 
-            <FormField label="Experience (years)">
-              <input className={inputCls} value={draft.experienceYears} onChange={set('experienceYears')} placeholder="10" />
-            </FormField>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField label="Experience (years)">
+                <input className={inputCls} value={draft.experienceYears} onChange={set('experienceYears')} placeholder="10" />
+              </FormField>
+              <FormField label="Instagram handle">
+                <input className={inputCls} value={draft.instagram} onChange={set('instagram')} placeholder="@handle" />
+              </FormField>
+            </div>
 
             <FormField label="Short bio">
               <textarea className={cn(inputCls, 'min-h-[90px] resize-y')} value={draft.shortBio} onChange={set('shortBio')} placeholder="A line clients see on the artist page." />
             </FormField>
 
             <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setEditing(null)} className="rounded-md border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
+              <button type="button" disabled={busy} onClick={() => setEditing(null)} className="rounded-md border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
                 Cancel
               </button>
-              <button type="button" onClick={handleSave} className="rounded-md bg-neutral-900 px-5 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-800">
-                {editing === 'new' ? 'Add artist' : 'Save changes'}
+              <button type="button" disabled={busy} onClick={handleSave} className="rounded-md bg-neutral-900 px-5 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-800 disabled:opacity-60">
+                {busy ? 'Saving…' : editing === 'new' ? 'Add artist' : 'Save changes'}
               </button>
             </div>
           </div>
@@ -192,10 +239,7 @@ function AdminArtists() {
         title="Remove artist?"
         message={toDelete ? `${toDelete.name} will be removed from the studio. Only artists without tattoo pieces can be removed.` : ''}
         onClose={() => setToDelete(null)}
-        onConfirm={() => {
-          deleteArtist(toDelete.id)
-          setToDelete(null)
-        }}
+        onConfirm={handleDelete}
       />
     </div>
   )

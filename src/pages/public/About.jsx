@@ -1,5 +1,3 @@
-import { ArrowRight } from 'lucide-react'
-import Button from '../../components/common/Button'
 import Reveal from '../../components/common/Reveal'
 import SectionHeading from '../../components/common/SectionHeading'
 import CTASection from '../../components/public/CTASection'

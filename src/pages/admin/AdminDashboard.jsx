@@ -1,4 +1,4 @@
-import { ArrowUpRight, Droplet, Inbox, Plus, Star, Users } from 'lucide-react'
+import { ArrowUpRight, Cloud, Droplet, Inbox, Plus, Star, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import StatCard from '../../components/admin/StatCard'
 import StatusBadge from '../../components/admin/StatusBadge'
@@ -6,16 +6,19 @@ import { useAdminData } from '../../context/AdminDataContext'
 import { formatDate } from '../../utils/format'
 
 function AdminDashboard() {
-  const { tattoos, artists, enquiries, artistName } = useAdminData()
+  const { tattoos, artists, enquiries, settings, backendLabel, backendMode } = useAdminData()
   const featured = tattoos.filter((t) => t.featured).length
   const recent = enquiries.slice(0, 6)
+  const brand = settings?.business?.name || 'Oddaka Inksters'
 
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-extrabold tracking-tight text-neutral-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-neutral-500">Studio overview — {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          <p className="mt-1 text-sm text-neutral-500">
+            {brand} — {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
         </div>
         <Link
           to="/admin/tattoos/new"
@@ -92,12 +95,15 @@ function AdminDashboard() {
             </ul>
           </div>
 
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 text-xs leading-relaxed text-neutral-500">
-            <p className="font-semibold text-neutral-700">Prototype note</p>
-            <p className="mt-1">
-              All data is stored locally in your browser. In Part 2 this admin will connect to a
-              real Supabase database — the layout you're using now will stay the same.
-            </p>
+          <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm">
+            <h2 className="font-display text-sm font-bold text-neutral-900">Data source</h2>
+            <div className="mt-3 flex items-start gap-2.5 rounded-md bg-neutral-50 p-3">
+              <Cloud size={14} className="mt-0.5 shrink-0 text-neutral-400" />
+              <p className="text-xs leading-relaxed text-neutral-500">
+                <span className="font-semibold text-neutral-700">{backendLabel}</span>
+                {backendMode === 'remote' ? ' — changes here publish straight to the live site.' : ' — your work is saved in this browser and won’t go live until Supabase is connected.'}
+              </p>
+            </div>
           </div>
 
           <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm">
@@ -107,6 +113,9 @@ function AdminDashboard() {
                 ['Add tattoo', '/admin/tattoos/new'],
                 ['Add artist', '/admin/artists'],
                 ['View enquiries', '/admin/enquiries'],
+                ['Edit offers', '/admin/offers'],
+                ['Website settings', '/admin/website'],
+                ['Homepage content', '/admin/website/homepage'],
                 ['Open public site', '/'],
               ].map(([label, to]) => (
                 <Link key={to} to={to} className="rounded-md border border-neutral-200 px-3 py-2 text-center text-xs font-semibold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50">
@@ -131,7 +140,7 @@ function AdminDashboard() {
                 <img src={a.portrait} alt="" className="h-12 w-12 rounded-md object-cover" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-neutral-900">{a.name}</p>
-                  <p className="truncate text-xs text-neutral-500">{a.specialties.join(' / ')}</p>
+                  <p className="truncate text-xs text-neutral-500">{a.specialties?.join(' / ')}</p>
                   <p className="mt-1 text-xs font-medium text-neutral-700">{count} pieces on record</p>
                 </div>
               </div>

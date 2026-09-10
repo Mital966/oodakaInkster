@@ -1,5 +1,3 @@
-import { ArrowLeftRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { cn } from '../../utils/cn'
 
 function StatCard({ label, value, sub, icon: Icon, accent = 'bg-neutral-900 text-neutral-100' }) {

@@ -63,6 +63,7 @@ function Contact() {
   const [searchParams] = useSearchParams()
   const [form, setForm] = useState({ ...EMPTY, artist: searchParams.get('artist') || '' })
   const [errors, setErrors] = useState({})
+  const [error, setError] = useState('')
   const [reference, setReference] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
@@ -100,17 +101,22 @@ function Contact() {
     e.preventDefault()
     if (!validate()) return
     setSubmitting(true)
-    await createEnquiry({
-      ...form,
-      idea: form.idea.trim(),
-      size: form.size || 'Not sure yet',
-      style: form.style || 'Not sure yet',
-      preferredDate: form.preferredDate || null,
-      budget: form.budget || 'Not sure yet',
-      artist: form.artist || null,
-    })
-    setSubmitting(false)
-    setDone(true)
+    try {
+      await createEnquiry({
+        ...form,
+        idea: form.idea.trim(),
+        size: form.size || 'Not sure yet',
+        style: form.style || 'Not sure yet',
+        preferredDate: form.preferredDate || null,
+        budget: form.budget || 'Not sure yet',
+        artist: form.artist || null,
+        referenceImageFile: reference?.file || null,
+      })
+      setDone(true)
+    } catch (err) {
+      setError(err?.message || 'We couldn’t send your enquiry. Please check your details and try again.')
+      setSubmitting(false)
+    }
   }
 
   const waMessage = whatsAppEnquiry(form)
@@ -292,9 +298,23 @@ function Contact() {
                   This message goes straight to the studio's enquiry queue. We reply on WhatsApp,
                   usually within a day.
                 </p>
-                <Button type="submit" size="lg" disabled={submitting}>
-                  {submitting ? 'Sending…' : 'Send Enquiry'} <ArrowRight size={15} />
-                </Button>
+                <div className="flex flex-col items-start gap-2 sm:items-end">
+                  <AnimatePresence>
+                    {error && (
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="text-xs text-[#e07a3f]"
+                      >
+                        {error}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                  <Button type="submit" size="lg" disabled={submitting}>
+                    {submitting ? 'Sending…' : 'Send Enquiry'} <ArrowRight size={15} />
+                  </Button>
+                </div>
               </div>
             </form>
           </Reveal>
