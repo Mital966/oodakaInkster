@@ -22,14 +22,24 @@ export default function OccasionBanner({ occasion }) {
   const accent = occasion.accentColor || '#e07a3f'
   const title = occasion.title || 'Special Occasion'
   const subtitle = occasion.subtitle || ''
+  const desktopImage = occasion.imageDesktop || occasion.image
+  const mobileImage = occasion.imageMobile || desktopImage
 
   return (
     <section className="relative overflow-hidden">
-      {occasion.image && (
+      {desktopImage && (
         <img
-          src={occasion.image}
+          src={desktopImage}
           alt={title}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 hidden h-full w-full object-cover md:block"
+          aria-hidden="true"
+        />
+      )}
+      {mobileImage && (
+        <img
+          src={mobileImage}
+          alt={title}
+          className="absolute inset-0 h-full w-full object-cover md:hidden"
           aria-hidden="true"
         />
       )}

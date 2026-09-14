@@ -56,6 +56,8 @@ export const DEFAULT_SETTINGS = {
       title: '',
       subtitle: '',
       image: '',
+      imageDesktop: '',
+      imageMobile: '',
       accentColor: '#e07a3f',
       ctaLabel: '',
       ctaUrl: '/contact',

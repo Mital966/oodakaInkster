@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Maximize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '../../utils/cn'
 
 // Polished self-contained video player with custom controls.
@@ -11,6 +11,13 @@ function VideoCard({ src, poster, title }) {
   const [muted, setMuted] = useState(false)
   const [progress, setProgress] = useState(0)
   const [showControls, setShowControls] = useState(true)
+  const [isTouch] = useState(() => typeof window !== 'undefined' && (window.matchMedia('(hover: none)').matches || navigator.maxTouchPoints > 0))
+
+  useEffect(() => {
+    if (!isTouch) return
+    const hide = setTimeout(() => setShowControls(false), 3000)
+    return () => clearTimeout(hide)
+  }, [playing, showControls, isTouch])
 
   const toggle = () => {
     const v = videoRef.current
@@ -49,6 +56,10 @@ function VideoCard({ src, poster, title }) {
         playsInline
         preload="metadata"
         onClick={toggle}
+        onTouchEnd={(e) => {
+          if (isTouch) setShowControls(true)
+          else e.preventDefault()
+        }}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onTimeUpdate={() => {
@@ -81,7 +92,9 @@ function VideoCard({ src, poster, title }) {
       <motion.div
         className={cn(
           'absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-ink-950/90 to-transparent px-4 pb-3 pt-8',
-          playing && 'opacity-0 transition-opacity duration-300 group-hover:opacity-100',
+          showControls || !playing
+            ? 'opacity-100 transition-opacity duration-300'
+            : 'pointer-events-none opacity-0 transition-opacity duration-300',
         )}
         animate={{ y: showControls ? 0 : 8 }}
       >

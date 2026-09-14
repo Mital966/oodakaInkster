@@ -31,13 +31,16 @@ function AdminWebsiteHomepage() {
   const { settings, updateSettings } = useAdminData()
   const { toast } = useToast()
   const [draft, setDraft] = useState(null)
-  const [occasionImage, setOccasionImage] = useState(null)
+  const [occasionImageDesktop, setOccasionImageDesktop] = useState(null)
+  const [occasionImageMobile, setOccasionImageMobile] = useState(null)
 
   useEffect(() => {
     if (settings) {
       setDraft(JSON.parse(JSON.stringify(settings)))
-      const img = settings.homepage?.occasion?.image
-      setOccasionImage(img ? { url: img, kind: 'existing' } : null)
+      const osc = settings.homepage?.occasion || {}
+      const desktop = osc.imageDesktop || osc.image
+      setOccasionImageDesktop(desktop ? { url: desktop, kind: 'existing' } : null)
+      setOccasionImageMobile(osc.imageMobile ? { url: osc.imageMobile, kind: 'existing' } : null)
     }
   }, [settings])
 
@@ -50,30 +53,36 @@ function AdminWebsiteHomepage() {
   const setOccasion = (field, value) =>
     setDraft((prev) => ({ ...prev, homepage: { ...prev.homepage, occasion: { ...prev.homepage.occasion, [field]: value } } }))
 
-  async function handleNewOccasionImage(value) {
+  async function handleNewOccasionImage(value, field) {
     if (!value) {
-      setOccasionImage(null)
-      setOccasion('image', '')
+      if (field === 'imageDesktop') setOccasionImageDesktop(null)
+      else setOccasionImageMobile(null)
+      setOccasion(field, '')
       return
     }
     if (value.kind === 'file') {
       try {
         const url = await uploadWebsiteImage(value.file)
-        setOccasionImage({ url, kind: 'existing' })
-        setOccasion('image', url)
+        if (field === 'imageDesktop') setOccasionImageDesktop({ url, kind: 'existing' })
+        else setOccasionImageMobile({ url, kind: 'existing' })
+        setOccasion(field, url)
       } catch (err) {
         toast('error', err.message || 'We couldn’t upload that image.')
       }
     } else {
-      setOccasionImage(value)
+      if (field === 'imageDesktop') setOccasionImageDesktop(value)
+      else setOccasionImageMobile(value)
     }
   }
 
   async function handleSave() {
     try {
       const homepage = JSON.parse(JSON.stringify(d.homepage))
-      if (occasionImage?.kind === 'file') {
-        homepage.occasion = { ...homepage.occasion, image: await uploadWebsiteImage(occasionImage.file) }
+      const pending = []
+      if (occasionImageDesktop?.kind === 'file') pending.push(['imageDesktop', occasionImageDesktop.file])
+      if (occasionImageMobile?.kind === 'file') pending.push(['imageMobile', occasionImageMobile.file])
+      for (const [field, file] of pending) {
+        homepage.occasion = { ...homepage.occasion, [field]: await uploadWebsiteImage(file) }
       }
       await updateSettings({ homepage })
       toast('success', 'Homepage content saved.')
@@ -173,9 +182,15 @@ function AdminWebsiteHomepage() {
         <Field label="Subtitle" hint="A short greeting or message under the title.">
           <textarea className={cn(inputCls, 'min-h-[70px] resize-y')} value={d.homepage.occasion.subtitle} onChange={(e) => setOccasion('subtitle', e.target.value)} placeholder="May Lord Ganesha bless your life with wisdom and prosperity" />
         </Field>
-        <div>
-          <span className="mb-1.5 block text-xs font-semibold text-neutral-700">Banner image</span>
-          <UploadDropzone value={occasionImage} onChange={handleNewOccasionImage} label="Choose an image" previewClass="aspect-video max-w-xs" />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <span className="mb-1.5 block text-xs font-semibold text-neutral-700">Website image</span>
+            <UploadDropzone value={occasionImageDesktop} onChange={(v) => handleNewOccasionImage(v, 'imageDesktop')} label="Choose desktop image" previewClass="aspect-video" />
+          </div>
+          <div>
+            <span className="mb-1.5 block text-xs font-semibold text-neutral-700">Mobile image</span>
+            <UploadDropzone value={occasionImageMobile} onChange={(v) => handleNewOccasionImage(v, 'imageMobile')} label="Choose mobile image" previewClass="aspect-[3/4]" />
+          </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Button label" hint="Leave empty to hide the button.">

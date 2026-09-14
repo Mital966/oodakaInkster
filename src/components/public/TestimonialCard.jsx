@@ -9,14 +9,14 @@ function TestimonialCard({ review }) {
           “{review.review}”
         </blockquote>
       </div>
-      <figcaption className="mt-7 flex items-center justify-between border-t border-ink-700/40 pt-5">
+      <figcaption className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-ink-700/40 pt-5">
         <div>
           <p className="font-display text-sm font-bold text-bone">{review.client}</p>
           <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wide2 text-ink-400">
             {review.style}
           </p>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-wide3 text-[#b3541e]" aria-label="5 star review">
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide3 text-[#b3541e]" aria-label="5 star review">
           ★★★★★
         </span>
       </figcaption>

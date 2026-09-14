@@ -14,7 +14,7 @@ const NAV = [
 
 function Footer() {
   return (
-    <footer className="border-t border-ink-700/60 bg-ink-900/40">
+    <footer className="border-t border-ink-700/60 bg-ink-900/40 pb-safe">
       <div className="mx-auto max-w-8xl px-6 py-16 lg:px-10 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">

@@ -1,5 +1,6 @@
 import { ArrowUpRight, Cloud, Droplet, Inbox, Plus, Star, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import EnquiriesStatusChart from '../../components/admin/EnquiriesStatusChart'
 import StatCard from '../../components/admin/StatCard'
 import StatusBadge from '../../components/admin/StatusBadge'
 import { useAdminData } from '../../context/AdminDataContext'
@@ -124,6 +125,15 @@ function AdminDashboard() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-neutral-200 bg-white shadow-sm">
+        <div className="border-b border-neutral-100 px-5 py-4">
+          <h2 className="font-display text-sm font-bold text-neutral-900">Enquiries by status</h2>
+        </div>
+        <div className="p-5">
+          <EnquiriesStatusChart enquiries={enquiries} />
         </div>
       </div>
 

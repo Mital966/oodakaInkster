@@ -89,19 +89,21 @@ function Lightbox({ images, index, onClose, onNavigate }) {
           </button>
         </div>
 
-        <div className="flex justify-center gap-2.5 px-5 py-5">
-          {images.map((src, i) => (
-            <button
-              key={src + i}
-              onClick={() => onNavigate(i)}
-              aria-label={`View image ${i + 1}`}
-              className={`h-14 w-11 overflow-hidden rounded-sm border transition-all ${
-                i === index ? 'border-bone' : 'border-ink-600 opacity-50 hover:opacity-90'
-              }`}
-            >
-              <img src={src} alt="" className="h-full w-full object-cover" />
-            </button>
-          ))}
+        <div className="w-full overflow-x-auto px-5 py-5 no-scrollbar">
+          <div className="mx-auto flex w-max items-center gap-2.5">
+            {images.map((src, i) => (
+              <button
+                key={src + i}
+                onClick={() => onNavigate(i)}
+                aria-label={`View image ${i + 1}`}
+                className={`h-14 w-11 shrink-0 overflow-hidden rounded-sm border transition-all ${
+                  i === index ? 'border-bone' : 'border-ink-600 opacity-50 hover:opacity-90'
+                }`}
+              >
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>

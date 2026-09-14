@@ -29,7 +29,7 @@ const Button = forwardRef(function Button(
   ref,
 ) {
   const classes = cn(
-    'group inline-flex items-center justify-center gap-2.5 font-display font-semibold uppercase tracking-wide2 whitespace-nowrap transition-colors duration-300 focus-visible:outline-offset-4 disabled:opacity-40',
+    'group inline-flex items-center justify-center gap-2.5 font-display font-semibold uppercase tracking-wide2 sm:whitespace-nowrap text-balance transition-colors duration-300 focus-visible:outline-offset-4 disabled:opacity-40',
     SIZES[size],
     VARIANTS[variant],
     className,

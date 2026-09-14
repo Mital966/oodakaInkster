@@ -53,7 +53,7 @@ function Navbar() {
     <>
       <header
         className={cn(
-          'fixed inset-x-0 top-0 z-[70] transition-all duration-500',
+          'fixed inset-x-0 top-0 z-[70] pt-safe transition-all duration-500',
           scrolled
             ? 'border-b border-ink-700/60 bg-ink-950/85 backdrop-blur-md'
             : 'border-b border-transparent bg-transparent',
@@ -107,7 +107,7 @@ function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[80] flex flex-col bg-ink-950 lg:hidden"
+            className="fixed inset-0 z-[80] flex flex-col bg-ink-950 pt-safe lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -152,7 +152,7 @@ function Navbar() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35, duration: 0.4 }}
-              className="border-t border-ink-700/60 px-8 py-7"
+              className="border-t border-ink-700/60 px-8 pb-7 pt-7 pb-safe"
             >
               <Button to="/contact" variant="primary" size="lg" className="w-full" onClick={() => setOpen(false)}>
                 Book a Consultation

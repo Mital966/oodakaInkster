@@ -79,7 +79,7 @@ function Hero({ settings }) {
           Oddaka Inksters — Custom Tattoo Studio
         </motion.p>
 
-        <h1 className="mt-6 font-display text-[2.9rem] font-black uppercase leading-[0.95] tracking-tight text-bone sm:text-7xl lg:text-[5.4rem]">
+        <h1 className="mt-6 font-display text-[2.3rem] font-black uppercase leading-[0.95] tracking-tight text-bone sm:text-7xl lg:text-[5.4rem]">
           {headingLines.map((line, i) => (
             <motion.span
               key={i}
