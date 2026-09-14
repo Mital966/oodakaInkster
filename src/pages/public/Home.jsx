@@ -6,6 +6,7 @@ import Reveal from '../../components/common/Reveal'
 import SectionHeading from '../../components/common/SectionHeading'
 import ArtistCard from '../../components/public/ArtistCard'
 import CTASection from '../../components/public/CTASection'
+import OccasionBanner from '../../components/common/OccasionBanner'
 import Page from '../../components/public/Page'
 import TattooCard from '../../components/public/TattooCard'
 import TestimonialCard from '../../components/public/TestimonialCard'
@@ -577,6 +578,7 @@ function Home() {
   return (
     <Page title="Oddaka Inksters | Premium Tattoo Studio" className="overflow-x-clip">
       <Hero settings={settings} />
+      <OccasionBanner occasion={settings?.homepage?.occasion} />
       <Marquee />
       {offers?.length > 0 && <OffersStrip offers={offers} />}
       <FeaturedWork featured={featured} artistName={artistName} />

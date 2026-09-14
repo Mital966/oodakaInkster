@@ -51,6 +51,17 @@ export const DEFAULT_SETTINGS = {
       description: "Tell us your idea. We'll help turn it into something permanent.",
       buttonLabel: 'Start Your Tattoo',
     },
+    occasion: {
+      enabled: false,
+      title: '',
+      subtitle: '',
+      image: '',
+      accentColor: '#e07a3f',
+      ctaLabel: '',
+      ctaUrl: '/contact',
+      startDate: '',
+      endDate: '',
+    },
   },
 }
 

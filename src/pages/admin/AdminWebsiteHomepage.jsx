@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useToast } from '../../components/admin/Toast'
 import FormField, { inputCls } from '../../components/admin/FormField'
+import Toggle from '../../components/admin/Toggle'
+import UploadDropzone from '../../components/admin/UploadDropzone'
 import { useAdminData } from '../../context/AdminDataContext'
 import { cn } from '../../utils/cn'
+import { uploadWebsiteImage } from '../../data/dataService'
 
 const block = 'rounded-lg border border-neutral-200 bg-white p-6 shadow-sm'
 
@@ -28,9 +31,14 @@ function AdminWebsiteHomepage() {
   const { settings, updateSettings } = useAdminData()
   const { toast } = useToast()
   const [draft, setDraft] = useState(null)
+  const [occasionImage, setOccasionImage] = useState(null)
 
   useEffect(() => {
-    if (settings) setDraft(JSON.parse(JSON.stringify(settings)))
+    if (settings) {
+      setDraft(JSON.parse(JSON.stringify(settings)))
+      const img = settings.homepage?.occasion?.image
+      setOccasionImage(img ? { url: img, kind: 'existing' } : null)
+    }
   }, [settings])
 
   if (!settings || !draft) return null
@@ -39,9 +47,35 @@ function AdminWebsiteHomepage() {
   const setUnder = (group, field) => (e) =>
     setDraft((prev) => ({ ...prev, homepage: { ...prev.homepage, [group]: { ...prev.homepage[group], [field]: e.target.value } } }))
 
+  const setOccasion = (field, value) =>
+    setDraft((prev) => ({ ...prev, homepage: { ...prev.homepage, occasion: { ...prev.homepage.occasion, [field]: value } } }))
+
+  async function handleNewOccasionImage(value) {
+    if (!value) {
+      setOccasionImage(null)
+      setOccasion('image', '')
+      return
+    }
+    if (value.kind === 'file') {
+      try {
+        const url = await uploadWebsiteImage(value.file)
+        setOccasionImage({ url, kind: 'existing' })
+        setOccasion('image', url)
+      } catch (err) {
+        toast('error', err.message || 'We couldn’t upload that image.')
+      }
+    } else {
+      setOccasionImage(value)
+    }
+  }
+
   async function handleSave() {
     try {
-      await updateSettings({ homepage: d.homepage })
+      const homepage = JSON.parse(JSON.stringify(d.homepage))
+      if (occasionImage?.kind === 'file') {
+        homepage.occasion = { ...homepage.occasion, image: await uploadWebsiteImage(occasionImage.file) }
+      }
+      await updateSettings({ homepage })
       toast('success', 'Homepage content saved.')
     } catch (err) {
       toast('error', err.message || 'We couldn’t save that. Please try again.')
@@ -110,6 +144,55 @@ function AdminWebsiteHomepage() {
         <Field label="Button label">
           <input className={inputCls} value={d.homepage.cta.buttonLabel} onChange={setUnder('cta', 'buttonLabel')} placeholder="Start Your Tattoo" />
         </Field>
+      </Section>
+
+      <Section title="Occasion banner" subtitle="Festival / celebration banner shown at the top of the homepage. Upload a themed image and colours.">
+        <div className="flex items-center justify-between gap-4 rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold text-neutral-900">Show occasion banner</p>
+            <p className="text-xs text-neutral-500">Turn the stand-alone greeting banner on or off.</p>
+          </div>
+          <Toggle on={d.homepage.occasion.enabled} onChange={(on) => setOccasion('enabled', on)} label="Toggle occasion banner" />
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Title" hint="e.g. Happy Ganesh Puja">
+            <input className={inputCls} value={d.homepage.occasion.title} onChange={(e) => setOccasion('title', e.target.value)} placeholder="Happy Ganesh Puja" />
+          </Field>
+          <Field label="Accent colour" hint="Tints the banner to match the occasion.">
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                className="h-10 w-14 cursor-pointer rounded-md border border-neutral-200 bg-neutral-50 p-1"
+                value={d.homepage.occasion.accentColor}
+                onChange={(e) => setOccasion('accentColor', e.target.value)}
+              />
+              <input className={cn(inputCls, 'font-mono')} value={d.homepage.occasion.accentColor} onChange={(e) => setOccasion('accentColor', e.target.value)} />
+            </div>
+          </Field>
+        </div>
+        <Field label="Subtitle" hint="A short greeting or message under the title.">
+          <textarea className={cn(inputCls, 'min-h-[70px] resize-y')} value={d.homepage.occasion.subtitle} onChange={(e) => setOccasion('subtitle', e.target.value)} placeholder="May Lord Ganesha bless your life with wisdom and prosperity" />
+        </Field>
+        <div>
+          <span className="mb-1.5 block text-xs font-semibold text-neutral-700">Banner image</span>
+          <UploadDropzone value={occasionImage} onChange={handleNewOccasionImage} label="Choose an image" previewClass="aspect-video max-w-xs" />
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Button label" hint="Leave empty to hide the button.">
+            <input className={inputCls} value={d.homepage.occasion.ctaLabel} onChange={(e) => setOccasion('ctaLabel', e.target.value)} placeholder="Greet us / Enquire now" />
+          </Field>
+          <Field label="Button link">
+            <input className={inputCls} value={d.homepage.occasion.ctaUrl} onChange={(e) => setOccasion('ctaUrl', e.target.value)} placeholder="/contact" />
+          </Field>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Starts on" hint="Leave blank to show immediately.">
+            <input type="date" className={inputCls} value={d.homepage.occasion.startDate} onChange={(e) => setOccasion('startDate', e.target.value)} />
+          </Field>
+          <Field label="Ends on" hint="Leave blank to stay until you turn it off.">
+            <input type="date" className={inputCls} value={d.homepage.occasion.endDate} onChange={(e) => setOccasion('endDate', e.target.value)} />
+          </Field>
+        </div>
       </Section>
 
       <div className="flex justify-end">
