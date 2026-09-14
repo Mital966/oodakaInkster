@@ -110,6 +110,11 @@ function Footer() {
             Custom tattoos · Fine line · Realism · Blackwork · Cover-ups
           </p>
         </div>
+
+        <p className="mt-6 text-center font-mono text-[10px] uppercase tracking-wide3 text-ink-600">
+          Website crafted by{' '}
+          <span className="text-ink-400 transition-colors hover:text-bone">Astra Digital</span>
+        </p>
       </div>
     </footer>
   )
